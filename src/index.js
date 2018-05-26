@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View,WebView,Platform,DeviceEventEmitter} from 'react-native';
+import { View, WebView, Platform, DeviceEventEmitter } from 'react-native';
 import api from './eosapi'
 
 /**
@@ -17,13 +17,22 @@ export class Eos {
   }
 
   /**
+ * 校验私钥
+ * @param {私钥} pk 
+ * @param {回调函数} callback 
+ */
+  static verifyPk(pk, callback) {
+    this.map["eos"].verifyPk(pk, callback);
+  }
+
+  /**
    * 生成私钥
    * @param {onwer助记词} ownerSeed 
    * @param {active助记词} activeSeed 
    * @param {回调函数} callback 
    */
-  static seedPrivateKey(ownerSeed,activeSeed,callback){
-    this.map["eos"].seedPrivateKey(ownerSeed,activeSeed,callback);
+  static seedPrivateKey(ownerSeed, activeSeed, callback) {
+    this.map["eos"].seedPrivateKey(ownerSeed, activeSeed, callback);
   }
 
   /**
@@ -32,8 +41,8 @@ export class Eos {
    * @param {私钥} pk 
    * @param {回调} callback 
    */
-  static sign(data,pk,callback){
-    this.map["eos"].sign(data,pk,callback);
+  static sign(data, pk, callback) {
+    this.map["eos"].sign(data, pk, callback);
   }
 
   /**
@@ -46,8 +55,8 @@ export class Eos {
    * @param {是否广播} broadcast 
    * @param {回调} callback 
    */
-  static transfer(from,to,quantity,memo,pk,broadcast,callback){
-    this.map["eos"].transfer(from,to,quantity,memo,pk,broadcast,callback);
+  static transfer(from, to, quantity, memo, pk, broadcast, callback) {
+    this.map["eos"].transfer(from, to, quantity, memo, pk, broadcast, callback);
   }
 
   /**
@@ -59,8 +68,8 @@ export class Eos {
    * @param {active公钥} activePublicKey 
    * @param {回调} callback 
    */
-  static createAccount(creator,createPrivateKey,newAccount,onwerPublicKey,activePublicKey,callback){
-    this.map["eos"].createAccount(creator,createPrivateKey,newAccount,onwerPublicKey,activePublicKey,callback);
+  static createAccount(creator, createPrivateKey, newAccount, onwerPublicKey, activePublicKey, callback) {
+    this.map["eos"].createAccount(creator, createPrivateKey, newAccount, onwerPublicKey, activePublicKey, callback);
   }
 
   /**
@@ -69,8 +78,8 @@ export class Eos {
    * @param {查询账户} account 
    * @param {回调} callback 
    */
-  static balance(contract,account,callback){
-    this.map["eos"].balance(contract,account,callback);
+  static balance(contract, account, callback) {
+    this.map["eos"].balance(contract, account, callback);
   }
 }
 
@@ -86,7 +95,7 @@ export class EosProvider extends Component {
     Eos.bind(this);
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     Eos.unBind();
   }
 
@@ -100,76 +109,90 @@ export class EosProvider extends Component {
   /**
    * 通过助记词生成私钥/公钥
    */
-  seedPrivateKey = (ownerSeed,activeSeed,callback) =>{
-    this.refs.eosjs.postMessage(JSON.stringify({method:api.eos_seed_private_key,ownerSeed,activeSeed}));
-    this.seedPrivateKeyCallback=callback;
+  seedPrivateKey = (ownerSeed, activeSeed, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_seed_private_key, ownerSeed, activeSeed }));
+    this.seedPrivateKeyCallback = callback;
   }
 
   /**
    * 对数据进行签名
    */
-  sign = (data,pk,callback) => {
-    this.refs.eosjs.postMessage(JSON.stringify({method:api.eos_sign_data,data,pk}));
-    this.signCallback=callback;
+  sign = (data, pk, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_sign_data, data, pk }));
+    this.signCallback = callback;
   }
 
   /**
    * 转账
    */
-  transfer = (from,to,quantity,memo,pk,broadcast,callback) =>{
-    this.refs.eosjs.postMessage(JSON.stringify({method:api.eos_transfer,from,to,quantity,memo,pk,broadcast,eosServer:this.props.server}));
-    this.transferCallback=callback;
+  transfer = (from, to, quantity, memo, pk, broadcast, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_transfer, from, to, quantity, memo, pk, broadcast, eosServer: this.props.server }));
+    this.transferCallback = callback;
   }
 
-   /**
-   * 创建账户
-   */
-  createAccount = (creator,createPrivateKey,newAccount,onwerPublicKey,activePublicKey,callback) => {
-    this.refs.eosjs.postMessage(JSON.stringify({method:api.eos_create_account,creator,createPrivateKey,newAccount,onwerPublicKey,activePublicKey,eosServer:this.props.server}));
-    this.createAccountCallback=callback;
+  /**
+  * 创建账户
+  */
+  createAccount = (creator, createPrivateKey, newAccount, onwerPublicKey, activePublicKey, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_create_account, creator, createPrivateKey, newAccount, onwerPublicKey, activePublicKey, eosServer: this.props.server }));
+    this.createAccountCallback = callback;
   }
 
-   /**
-   * 查询余额
-   */
-  balance = (contract,account,callback) =>{
-    this.refs.eosjs.postMessage(JSON.stringify({method:api.eos_balance,contract,account,eosServer:this.props.server}));
-    this.balanceCallback=callback;
+  /**
+  * 查询余额
+  */
+  balance = (contract, account, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_balance, contract, account, eosServer: this.props.server }));
+    this.balanceCallback = callback;
+  }
+
+  /**
+* 查询余额
+*/
+  verifyPk = (pk, callback) => {
+    this.refs.eosjs.postMessage(JSON.stringify({ method: api.eos_verify_pk, pk, eosServer: this.props.server }));
+    this.verifyCallback = callback;
   }
 
   /**
    * 获取结果
    */
-  onMessage = (e) =>{
+  onMessage = (e) => {
     let result = JSON.parse(e.nativeEvent.data);
     //创建私钥
-    if(result.method==api.eos_seed_private_key && this.seedPrivateKeyCallback){
+    if (result.method == api.eos_seed_private_key && this.seedPrivateKeyCallback) {
       this.seedPrivateKeyCallback(result);
       this.seedPrivateKeyCallback = null;
     }
     //签名
-    if(result.method==api.eos_sign_data && this.signCallback){
+    if (result.method == api.eos_sign_data && this.signCallback) {
       this.signCallback(result);
       this.signCallback = null;
     }
     //转账
-    if(result.method==api.eos_transfer && this.transferCallback){
+    if (result.method == api.eos_transfer && this.transferCallback) {
       this.transferCallback(result);
       this.transferCallback = null;
     }
     //创建账户
-    if(result.method==api.eos_create_account && this.createAccountCallback){
+    if (result.method == api.eos_create_account && this.createAccountCallback) {
       this.createAccountCallback(result);
       this.createAccountCallback = null;
     }
     //查询余额
-    if(result.method==api.eos_balance && this.balanceCallback){
+    if (result.method == api.eos_balance && this.balanceCallback) {
       this.balanceCallback(result);
       this.balanceCallback = null;
+    }
+
+    //查询余额
+    if (result.method == api.eos_verify_pk && this.verifyCallback) {
+      this.verifyCallback(result);
+      this.verifyCallback = null;
     }
   }
 
   render() {
-    return (<View style={{flex:1,height:0,zIndex:-999999,position:'absolute'}}><WebView ref="eosjs" style={{height:0,width:0,backgroundColor:'transparent'}} source={require('./eosjs.html')} onMessage={(e)=>{this.onMessage(e)}}/></View>);
+    return (<View style={{ flex: 1, height: 0, zIndex: -999999, position: 'absolute' }}><WebView ref="eosjs" style={{ height: 0, width: 0, backgroundColor: 'transparent' }} source={require('./eosjs.html')} onMessage={(e) => { this.onMessage(e) }} /></View>);
   }
 }
