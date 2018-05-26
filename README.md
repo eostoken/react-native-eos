@@ -7,6 +7,8 @@ react native eosjs component upgrade to dawn4
 
 see https://github.com/espritblock/eos.git
 
+replace node_module/react-native-eos/src/index.js and eosapi.js eosjs.html
+
 # install
 
 ```
